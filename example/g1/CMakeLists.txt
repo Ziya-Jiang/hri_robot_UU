@@ -13,6 +13,15 @@ target_link_libraries(g1_ankle_swing_example unitree_sdk2)
 add_executable(g1_audio_client_example audio/g1_audio_client_example.cpp)
 target_link_libraries(g1_audio_client_example unitree_sdk2)
 
+add_executable(g1_asr_client_example audio/g1_asr_client_example.cpp)
+target_link_libraries(g1_asr_client_example unitree_sdk2)
+
+add_executable(g1_tts_client_example audio/g1_tts_client_example.cpp)
+target_link_libraries(g1_tts_client_example unitree_sdk2)
+
+add_executable(g1_asr_tts_voice_command audio/g1_asr_tts_voice_command.cpp)
+target_link_libraries(g1_asr_tts_voice_command unitree_sdk2)
+
 add_executable(g1_dex3_example dex3/g1_dex3_example.cpp)
 target_link_libraries(g1_dex3_example unitree_sdk2)
 
