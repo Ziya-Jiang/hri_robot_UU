@@ -58,3 +58,11 @@ Note that if you install the library to other places other than `/opt/unitree_ro
 
 ### Notice
 For more reference information, please go to [Unitree Document Center](https://support.unitree.com/home/zh/developer).
+
+## 2025.12.28 开发日志
+
+### RGB-D 序列采集
+将头顶 type C 接口通过 typeC-USB 转接线（支持 USB 3.0 以上最佳）连接到电脑，即可通过 `catkin_Realsense_ws` 中的 `realsense_data_collector.py`（使用详见统一目录下的 README）进行 TUM 格式的 RGB-D 采集。
+
+### SLAM 程序入口
+`unitree_slam` 目录下的 `keyDemo eno1` 是用来建图和位姿收集的，收集好位姿后可以使用 `Voice_Navigation` 进行语音导航。任意点导航直接使用 `KeyDemo` 即可。地图你就换个命名就可以，我们没有访问权限，也不再 164 的 JNix 里面，已知位姿都在 `saved_pose.json` 里面，建议在代码里面改一个名字，`keyDemo` 和 `voice_navigation` 保持一致。

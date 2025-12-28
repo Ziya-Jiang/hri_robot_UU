@@ -52,8 +52,27 @@ int main(int argc, char const *argv[]) {
   ret = client.GetVolume(volume);
   std::cout << "GetVolume API ret:" << ret
             << "  volume = " << std::to_string(volume) << std::endl;
+  if (ret != 0) {
+    std::cout << "ERROR: GetVolume failed! Return code: " << ret << std::endl;
+    std::cout << "Possible reasons:" << std::endl;
+    std::cout << "  - Robot not connected or not responding" << std::endl;
+    std::cout << "  - Network interface '" << argv[1] << "' is incorrect" << std::endl;
+    std::cout << "  - Audio service not running on robot" << std::endl;
+    return 1;
+  }
+  
   ret = client.SetVolume(100);
   std::cout << "SetVolume to 100% , API ret:" << ret << std::endl;
+  if (ret != 0) {
+    std::cout << "WARNING: SetVolume failed! Return code: " << ret << std::endl;
+  } else {
+    // 验证音量是否真的设置成功
+    uint8_t verify_volume;
+    ret = client.GetVolume(verify_volume);
+    if (ret == 0) {
+      std::cout << "Volume verified: " << static_cast<int>(verify_volume) << "%" << std::endl;
+    }
+  }
 
   /*TTS Example - 严格按照原始代码格式 */
   std::string text;
@@ -99,21 +118,36 @@ int main(int argc, char const *argv[]) {
     }
 
     // 严格按照原始代码的调用方式
+    std::cout << "Calling TtsMaker with text: \"" << text << "\", language: " << language << std::endl;
     ret = client.TtsMaker(text, language);
     std::cout << "TtsMaker API ret:" << ret << std::endl;
     
-    // 根据文本长度和语言估算等待时间
-    int wait_time = 5;  // 默认5秒
-    if (language == 1) {
-      wait_time = 8;  // 英文稍长
-    } else if (language == 2) {
-      wait_time = 6;  // 日语中等长度
+    if (ret == 0) {
+      std::cout << "TTS request successful! Audio should be playing now..." << std::endl;
+      // 根据文本长度和语言估算等待时间
+      int wait_time = 5;  // 默认5秒
+      if (language == 1) {
+        wait_time = 8;  // 英文稍长
+      } else if (language == 2) {
+        wait_time = 6;  // 日语中等长度
+      }
+      // 根据文本长度调整（粗略估算：中文约2字/秒，英文约3词/秒，日文约2字/秒）
+      int estimated_time = (text.length() / 2) + 2;
+      if (estimated_time > wait_time) wait_time = estimated_time;
+      
+      std::cout << "Waiting " << 5 << " seconds for audio playback..." << std::endl;
+      unitree::common::Sleep(5);
+      std::cout << "Audio playback should be complete." << std::endl;
+    } else {
+      std::cout << "ERROR: TTS request failed! Return code: " << ret << std::endl;
+      std::cout << "Possible reasons:" << std::endl;
+      std::cout << "  - Network connection issue" << std::endl;
+      std::cout << "  - Robot not connected or not responding" << std::endl;
+      std::cout << "  - Audio service not available" << std::endl;
+      std::cout << "  - Invalid text or language parameter" << std::endl;
+      std::cout << "  - TTS service error on robot" << std::endl;
+      return 1;
     }
-    // 根据文本长度调整（粗略估算：中文约2字/秒，英文约3词/秒，日文约2字/秒）
-    wait_time = 5;
-    
-    std::cout << "Waiting " << wait_time << " seconds for audio playback..." << std::endl;
-    unitree::common::Sleep(wait_time);
   } else {
     // 没有提供参数，显示使用说明
     std::cout << "No option or text provided. Please specify:" << std::endl;
